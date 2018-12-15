@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>SparkMongoOperation</groupId>
+  <artifactId>SparkMongoOperation</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>SparkMongoExamples</name>
+  <description>Include Examples From Spark And MongoDB Operations</description>
+  	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<scala.version>2.11</scala.version>
+		<spark.version>2.3.2</spark.version>
+		<mongo.version>2.3.1</mongo.version>
+	</properties>
+
+	<dependencies>
+		<!-- Spark -->
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_${scala.version}</artifactId>
+			<version>${spark.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mongodb.spark</groupId>
+			<artifactId>mongo-spark-connector_2.11</artifactId>
+			<version>${mongo.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_${scala.version}</artifactId>
+			<version>${spark.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-mllib_${scala.version}</artifactId>
+			<version>${spark.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+  
+</project>
