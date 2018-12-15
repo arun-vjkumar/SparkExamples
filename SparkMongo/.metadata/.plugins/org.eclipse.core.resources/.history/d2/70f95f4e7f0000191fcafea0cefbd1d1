@@ -1,0 +1,60 @@
+package com.spark.mongo;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
+
+public class CSVToDfToRDD {
+	
+	final static String APPNAME = "CSV To DF To RDD";
+	final static SparkSession sparkSession = SparkSessionInit.getSparkSession(APPNAME);
+	final static String PATH = "src/main/resources/data/books.csv";
+	final static String FORMAT = "csv"; 
+	final static String URI = "mongodb://127.0.0.1:27017/spark_data.books";
+	final static String DB = "spark_data";
+	final static String COLLECTION = "books";
+
+	public static void main(String[] args) {
+		CSVToDfToRDD obj = new CSVToDfToRDD();
+		Dataset<Row> dataDF = obj.readFromCsv();
+		obj.saveToDB(dataDF);
+		
+		Dataset<Row> newDataDF = obj.loadFromDB();
+		newDataDF.show(10);
+		
+	}
+	
+	public Dataset<Row> readFromCsv(){
+		Map<String, String> options = new HashMap<String, String>();
+		options.put("header", "true");
+		Dataset<Row> dataDF = LoadData.loadDataFromFile(sparkSession, FORMAT, PATH, options);
+		dataDF.show(10);		
+		RDD<Row> dataRDD = dataDF.rdd();
+		System.out.println(dataRDD.take(1));
+
+		dataDF = dataDF.withColumnRenamed("id", "_id");	
+		return dataDF;
+		
+	}
+	
+	public void saveToDB(Dataset<Row> dataDF){		
+		Map<String, Object> configurations = new HashMap<>();
+		configurations.put("uri", URI);
+		configurations.put("database", DB);
+		configurations.put("collection", COLLECTION);
+		DBOperations.insertDataToNoSqlDB(dataDF, SaveMode.Overwrite, configurations);
+	}
+	
+	public Dataset<Row> loadFromDB(){
+		Map<String, Object> configurations = new HashMap<>();
+		configurations.put("uri", URI);
+		configurations.put("database", DB);
+		configurations.put("collection", COLLECTION);
+		return DBOperations.loadDataFromNoSqlDB(sparkSession, configurations);
+	}
+}

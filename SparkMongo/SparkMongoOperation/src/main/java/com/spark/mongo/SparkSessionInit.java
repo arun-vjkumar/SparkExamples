@@ -1,0 +1,26 @@
+package com.spark.mongo;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.SparkSession;
+
+public class SparkSessionInit {
+	
+	final static String MEMORY = "471859200";
+	final static String HOST = "localhost";
+	
+	public static SparkSession getSparkSession(String appName){
+		return SparkSession
+				.builder()
+				.appName(appName)
+				.config(getSparkConfig())
+				.getOrCreate();
+	}
+	
+	public static SparkConf getSparkConfig(){
+		return new SparkConf()
+				.setMaster("local[*]")
+				.set("spark.testing.memory", MEMORY)
+				.set("spark.driver.host", HOST);
+	}
+
+}

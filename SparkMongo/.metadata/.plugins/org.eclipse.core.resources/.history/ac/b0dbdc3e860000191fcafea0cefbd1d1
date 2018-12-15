@@ -1,0 +1,56 @@
+package com.spark.mongo;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
+
+public class SparkMongoApp {
+	
+	final static String APPNAME = "Spark Mongo Application";
+	final static SparkSession sparkSession = SparkSessionInit.getSparkSession(APPNAME);
+	final static String PATH = "src/main/resources/data/Restaurants.csv";
+	final static String FORMAT = "csv"; 
+	final static String URI = "mongodb://127.0.0.1:27017/spark_data.rSestaurants";
+	final static String DB = "spark_data";
+	final static String COLLECTION = "restaurants";
+
+	public static void main(String[] args) {
+		SparkMongoApp obj = new SparkMongoApp();
+		Dataset<Row> dataDF = obj.readFromCsv();
+		obj.saveToDB(dataDF);
+		
+		Dataset<Row> newDataDF = obj.loadFromDB();
+		newDataDF.show(10);
+	}
+	
+	public Dataset<Row> readFromCsv(){
+		Map<String, String> options = new HashMap<String, String>();
+		options.put("header", "false");
+		options.put("delimiter", ";");
+		Dataset<Row> dataDF = LoadData.loadDataFromFile(sparkSession, FORMAT, PATH, options);
+		dataDF.show(10);
+		return dataDF;
+		
+	}
+	
+	public void saveToDB(Dataset<Row> dataDF){		
+		Map<String, Object> configurations = new HashMap();
+		configurations.put("uri", URI);
+		configurations.put("database", DB);
+		configurations.put("collection", COLLECTION);
+		DBOperations.insertDataToNoSqlDB(dataDF, SaveMode.Overwrite, configurations);
+	}
+	
+	public Dataset<Row> loadFromDB(){
+		Map<String, Object> configurations = new HashMap();
+		configurations.put("uri", URI);
+		configurations.put("database", DB);
+		configurations.put("collection", COLLECTION);
+		return DBOperations.loadDataFromNoSqlDB(sparkSession, configurations);
+	}
+}
